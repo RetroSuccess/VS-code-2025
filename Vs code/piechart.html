@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>2025 Election Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+        }
+        #chart {
+            width: 400px;
+            margin: 0 auto;
+        }
+        .legend-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 0 15px;
+        }
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            margin-right: 5px;
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <h1>2025 Election Results</h1>
+    <div id="chart">
+        <canvas id="electionChart"></canvas>
+    </div>
+    <div class="legend-container" id="customLegend"></div>
+
+    <script>
+        const ctx = document.getElementById('electionChart');
+        const chart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['DAD Party (45%)', 'MCD Party (23%)', 'CCCC Party (27%)', 'PPP Party (5%)'],
+                datasets: [{
+                    data: [45, 23, 27, 5],
+                    backgroundColor: ['red', 'lightgreen', 'lightblue', 'green'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false // Hide default legend
+                    }
+                }
+            }
+        });
+
+        // Create custom horizontal legend
+        const customLegend = document.getElementById('customLegend');
+        chart.data.labels.forEach((label, index) => {
+            const legendItem = document.createElement('div');
+            legendItem.className = 'legend-item';
+            
+            const colorBox = document.createElement('div');
+            colorBox.className = 'legend-color';
+            colorBox.style.backgroundColor = chart.data.datasets[0].backgroundColor[index];
+            
+            const labelText = document.createElement('span');
+            labelText.textContent = label;
+            
+            legendItem.appendChild(colorBox);
+            legendItem.appendChild(labelText);
+            customLegend.appendChild(legendItem);
+        });
+    </script>
+</body>
+</html>

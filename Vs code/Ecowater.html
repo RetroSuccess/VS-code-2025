@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<head>
+  <title>EcoSmart Water Bottle</title>
+
+  <!-- Embedded CSS styles for the entire page -->
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    header {
+      background-color: black;
+      color: white;
+      padding: 13px ;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+    }
+
+    .container {
+      padding: 20px;
+      text-align: center;
+    }
+
+    img{
+        width: 250px;
+        height: 300px;
+    }
+
+    #sub{
+        width: 100px;
+        margin: auto;
+        display: block;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      padding-top: 100px;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: black;
+    }
+
+    .modal-content {
+      background-color: white;
+      margin: auto;
+      padding: 20px;
+      width: 80%;
+      max-width: 400px;
+    }
+
+    .footer {
+      background: #222;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    form {
+      max-width: 400px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    input, textarea {
+      padding: 10px;
+    }
+
+    button, .buy-button {
+      padding: 10px 20px;
+      background-color: green;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+  </style>
+</head>
+<body>
+    <!-- Page header with navigation -->
+  <header>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">Features</a>
+      <a href="#">Pricing</a>
+      <a href="#contact">Contact Us</a>
+    </nav>
+  </header>
+<!-- Main content -->
+  <div class="container">
+    <h1>EcoSmart Water Bottle</h1>
+    <!-- Image code -->
+    <img src="https://skyglow.co.za/cdn/shop/files/Turq_Blue_ANGLED_WITH_BACKGROUND.png?v=1743017163" alt="EcoSmart Water Bottle"><br>
+    <!-- Button for the model -->
+    <button class="buy-button" onclick="openModal()">Buy Now</button>
+    <h2 id="totalPrice">Total Price: R750.00</h2>
+  </div>
+
+  <!-- Purchase modal -->
+  <div id="buyModal" class="modal">
+    <div class="modal-content">
+      <h3>Select Product Options</h3>
+       <!-- Color selection dropdown -->
+      <label>Color:
+        <select id="colorSelect" onchange="updatePrice()">
+          <option value="0">Standard</option>
+          <option value="50">Blue (+R50)</option>
+          <option value="75">Black (+R75)</option>
+        </select>
+      </label><br><br>
+      
+      <label>
+        <input type="checkbox" id="engraving" onchange="updatePrice()" /> Custom Engraving (+R100)
+      </label><br><br>
+      
+      <!-- Confirm button to close modal -->
+      <button onclick="closeModal()">Confirm</button>
+    </div>
+  </div>
+
+<!-- Footer section with contact form -->
+  <footer class="footer" id="contact">
+    <h2>Contact Us</h2>
+    <!-- Contact form with validation -->
+    <form onsubmit="return validateForm()">
+      <input type="text" placeholder="Your Name" required>
+      <input type="email" placeholder="Your Email" required>
+      <textarea placeholder="Your Message" required></textarea>
+      <label><input type="checkbox" id="terms"> I agree to the <a href="#">Terms and Conditions</a></label>
+      <button type="submit" id="sub">Submit</button>
+    </form>
+  </footer>
+
+  <!-- The JavaScript functions for the page -->
+  <script>
+     /**
+     * Opens the purchase modal dialog
+     * Sets the modal's display style to 'block' to make it visible
+     */
+    function openModal() {
+      document.getElementById('buyModal').style.display = 'block';
+    }
+
+     /**
+     * Closes the purchase modal dialog
+     * Sets the modal's display style to 'none' to hide it
+     */
+    function closeModal() {
+      document.getElementById('buyModal').style.display = 'none';
+    }
+
+    /**
+     * Calculates and updates the total price based on options that the user selected
+     * Gets values from:
+     * - Base price (R750)
+     * - Color selection dropdown (additional cost)
+     * - Engraving checkbox (R100 if checked)
+     * Updates the displayed total price in the #totalPrice element
+     */
+    function updatePrice() {
+    // Base price of the product
+      const basePrice = 750;
+
+    // Get additional cost from selected color (converted to number)
+      const colorCost = Number(document.getElementById('colorSelect').value);
+
+    // Check if engraving is selected (add R100 if checked)
+      const engraving = document.getElementById('engraving').checked ? 100 : 0;
+
+    // Calculate total price
+      const total = basePrice + colorCost + engraving;
+
+    // Update the displayed price with currency formatting
+      document.getElementById('totalPrice').innerText = 'Total Price: R' + total.toFixed(2);
+    }
+
+    /**
+     * Validates the contact form before submission
+     * Checks if the terms checkbox is checked
+     * Shows alert if terms aren't agreed to
+     * Returns  as false to prevent form submission if the validation is failed
+     * Returns as true if validation works
+     * @returns {boolean} Whether form is valid for submission
+     */
+    function validateForm() {
+      const terms = document.getElementById('terms');
+      if (!terms.checked) {
+        alert("Please agree to the Terms and Conditions before submitting.");
+        return false;
+      }
+      // Show success message
+      alert("Form submitted successfully!");
+      return true;
+    }
+  </script>
+</body>
+</html>

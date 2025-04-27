@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Todo List</title>
+    <style>
+        /* Base styling for the page */
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px; 
+            margin: 0 auto;   
+            padding: 20px;
+            background: lightgray; 
+        }
+        
+        /* Main container styling */
+        #app {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;      
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid lightgray;
+        }
+        
+        /* Form styling for adding new todos */
+        #todo-form {
+            display: flex;
+            gap: 10px;  /* Space between input and button */
+        }
+        
+        /* Input field styling */
+        #todo-input {
+            flex-grow: 1;  /* Takes up remaining space */
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        button {
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            border: none;
+        }
+        
+        /* Filter buttons container */
+        .filters {
+            display: flex;
+            gap: 10px;  /* Space between filter buttons */
+        }
+        
+        .filters button {
+            background: white; 
+            border: 1px solid gray;
+        }
+        
+        .filters button.active {
+            background: black;
+            color: white;
+        }
+        
+        /* Todo list styling */
+        #todo-list {
+            list-style: none; 
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;  /* Space between todo items */
+        }
+        
+        /* Individual todo item styling */
+        #todo-list li {
+            display: flex;
+            justify-content: space-between;  /* Space between text and delete button */
+            align-items: center;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        /* Container for checkbox and todo text */
+        .todo-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;  /* Space between checkbox and text */
+        }
+        
+        .completed {
+            text-decoration: line-through;
+            color: grey; 
+        }
+        
+        .delete-btn {
+            background: red;
+        }
+        
+        .add-btn {
+            background: black;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main application container -->
+    <div id="app">
+        <h1>Todo List</h1>
+        
+        <!-- Form for adding new todos -->
+        <form id="todo-form">
+            <input type="text" id="todo-input" placeholder="Add a new todo..." required>
+            <button type="submit" class="add-btn">Add</button>
+        </form>
+        
+        <!-- Filter buttons -->
+        <div class="filters">
+            <button data-filter="all" class="active">All</button>
+            <button data-filter="completed">Completed</button>
+            <button data-filter="active">Active</button>
+        </div>
+        
+        <!-- List where todos will be displayed -->
+        <ul id="todo-list"></ul>
+    </div>
+
+    <script>
+        // Application state object to track todos and current filter
+        const state = {
+            todos: [],       // Array to store todo items
+            filter: 'all'    // Current filter ('all', 'completed', or 'active')
+        };
+
+        // Cache DOM elements for better performance
+        const elements = {
+            form: document.getElementById('todo-form'),
+            input: document.getElementById('todo-input'),
+            list: document.getElementById('todo-list'),
+            filters: document.querySelector('.filters')
+        };
+
+        // Set up event listeners when DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            elements.form.addEventListener('submit', handleAddTodo);      // Form submission
+            elements.filters.addEventListener('click', handleFilterChange); // Filter changes
+            elements.list.addEventListener('click', handleTodoActions);    // Todo interactions
+            render();  // Initial render
+        });
+
+        /**
+         * Handles adding new todos
+         * @param {Event} e - The submit event
+         */
+        function handleAddTodo(e) {
+            e.preventDefault();  // Prevent form submission reload
+            const title = elements.input.value.trim();
+            if (title) {
+                // Add new todo to beginning of array
+                state.todos.unshift({
+                    id: Date.now(),  // Unique ID using timestamp
+                    title,
+                    completed: false
+                });
+                elements.input.value = '';  // Clear input field
+                render();  // Update UI
+            }
+        }
+
+        /**
+         * Handles filter changes
+         * @param {Event} e - The click event
+         */
+        function handleFilterChange(e) {
+            if (e.target.tagName === 'BUTTON') {
+                state.filter = e.target.dataset.filter;  // Update current filter
+                // Update active button styling
+                document.querySelector('.filters .active').classList.remove('active');
+                e.target.classList.add('active');
+                render();  // Update UI
+            }
+        }
+
+        /**
+         * Handles todo actions (toggle complete/delete)
+         * @param {Event} e - The click event
+         */
+        function handleTodoActions(e) {
+            // Get todo ID from data attribute
+            const todoId = Number(e.target.closest('li')?.dataset.id);
+            if (!todoId) return;  // Exit if not clicking on a todo item
+
+            if (e.target.classList.contains('delete-btn')) {
+                // Remove todo from array
+                state.todos = state.todos.filter(todo => todo.id !== todoId);
+            } else if (e.target.type === 'checkbox') {
+                // Toggle completion status
+                const todo = state.todos.find(t => t.id === todoId);
+                if (todo) todo.completed = !todo.completed;
+            }
+            render();  // Update UI
+        }
+
+        /**
+         * Renders the todo list based on current state
+         */
+        function render() {
+            // Filter todos based on current filter
+            const filteredTodos = state.todos.filter(todo => {
+                if (state.filter === 'completed') return todo.completed;
+                if (state.filter === 'active') return !todo.completed;
+                return true;  // Show all if filter is 'all'
+            });
+
+            // Generate HTML for todos
+            elements.list.innerHTML = filteredTodos.map(todo => `
+                <li data-id="${todo.id}">
+                    <div class="todo-item">
+                        <input type="checkbox" ${todo.completed ? 'checked' : ''}>
+                        <span class="${todo.completed ? 'completed' : ''}">${todo.title}</span>
+                    </div>
+                    <button class="delete-btn">Delete</button>
+                </li>
+            `).join('');  // Convert array to string
+        }
+    </script>
+</body>
+</html>
